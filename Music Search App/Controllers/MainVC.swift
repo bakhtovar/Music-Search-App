@@ -287,6 +287,12 @@ class MainVC: UIViewController {
         self.navigationItem.hidesSearchBarWhenScrolling = false
     }
     
+    private func navigateToDetail(with mediaItem: MediaItem) {
+        let aboutMediaVC = AboutMediaVC(mediaItem: mediaItem)
+        navigationController?.pushViewController(aboutMediaVC, animated: true)
+    }
+    
+    
     // MARK: - Display Search History Suggestions
     
     private func displaySearchHistorySuggestions(for searchController: UISearchController) {
@@ -316,6 +322,10 @@ extension MainVC: UISearchResultsUpdating, UISearchBarDelegate, UISearchControll
         } else {
             // Обновляем фильтрацию истории
             searchResultVC.searchText = text
+        }
+        
+        searchResultVC.onMediaItemSelected = { [weak self] mediaItem in
+            self?.navigateToDetail(with: mediaItem)
         }
     }
     

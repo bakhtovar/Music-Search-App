@@ -250,25 +250,48 @@ class MusicSearchViewModel {
         }
     }
     
+    // Properties for handling artist lookup
+    var artistDetails: ArtistDetails? {
+        didSet {
+            self.didSetArtistDetails?(artistDetails)
+        }
+    }
+    
+    private(set) var artistLookupInProgress: Bool = false {
+        didSet {
+            self.didSetArtistLookupInProgress?(artistLookupInProgress)
+        }
+    }
+    
+    private(set) var artistLookupError: ErrorResult? = nil {
+        didSet {
+            self.didSetArtistLookupError?(artistLookupError)
+        }
+    }
+    
+    
     // Closures for updating UI
     var didSetMediaResults: (([MediaItem]?) -> Void)? = nil
     var didSetSearchInProcess: ((Bool) -> Void)? = nil
     var didSetSearchError: ((ErrorResult?) -> Void)? = nil
     var didUpdateSuggestions: (([String]) -> Void)? = nil
     
+    var didSetArtistDetails: ((ArtistDetails?) -> Void)?
+    var didSetArtistLookupInProgress: ((Bool) -> Void)?
+    var didSetArtistLookupError: ((ErrorResult?) -> Void)?
+    
+    
     // ---------------------------------------------------
     // MARK: - Public Methods
     // ---------------------------------------------------
     
     /// Performs media search for the provided query
-    public func searchMedia(query: String) {
+    public func searchMedia(query: String, limit: Int = 30) {
         self.searchInProcess = true
-        
         // Save search query to history
         saveSearchQuery(query)
-        
-        // Call the service to search media
-        service.searchMedia(query: query) { [weak self] responseResult in
+        // Call the service to search media with the dynamic limit
+        service.searchMedia(query: query, limit: limit) { [weak self] responseResult in
             // Set searchInProcess to false after request completion
             self?.searchInProcess = false
             
@@ -302,6 +325,43 @@ class MusicSearchViewModel {
         }
     }
     
+    // Method for looking up artist details
+    public func lookupArtist(artistId: Int) {
+        self.artistLookupInProgress = true
+        
+        service.lookupArtist(artistId: artistId) { [weak self] responseResult in
+            self?.artistLookupInProgress = false
+            
+            if let responseResult = responseResult {
+                if responseResult.status == .success {
+                    self?.artistDetails = responseResult.data?.results.first
+                } else if responseResult.status == .failed {
+                    // Handle server errors
+                    self?.searchError = ErrorResult(
+                        title: "Error",
+                        message: responseResult.message ?? "Unknown error",
+                        type: "server"
+                    )
+                } else if responseResult.status == .timeOut {
+                    // Handle timeout errors
+                    self?.searchError = ErrorResult(
+                        title: "Timeout",
+                        message: "Request timed out",
+                        type: "timeout"
+                    )
+                } else {
+                    // Handle other connection errors
+                    self?.searchError = ErrorResult(
+                        title: "Connection Error",
+                        message: "Network connection issues",
+                        type: "connection"
+                    )
+                }
+                
+            }
+        }
+    }
+    
     /// Filters search history suggestions based on the input query
     public func filterSuggestions(for query: String) {
         let history = getSearchHistory()
@@ -309,7 +369,7 @@ class MusicSearchViewModel {
     }
     
     /// Saves a new search query to history (up to maxHistoryCount)
-    private func saveSearchQuery(_ query: String) {
+    func saveSearchQuery(_ query: String) {
         var history = getSearchHistory()
         
         // Remove the query if it already exists (to avoid duplicates)

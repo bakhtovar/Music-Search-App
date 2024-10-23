@@ -414,6 +414,8 @@ import UIKit
 
 class MusicSearchVC: UIViewController {
     
+    var onMediaItemSelected: ((MediaItem) -> Void)?
+    
     // Timer to debounce user input for search
     private var timer: Timer?
     
@@ -472,6 +474,8 @@ class MusicSearchVC: UIViewController {
         
         // Bind ViewModel changes to update the UI
         bindViewModel()
+        
+        addKeyboardObservers()
     }
     
     // MARK: - Private Methods
@@ -534,7 +538,9 @@ class MusicSearchVC: UIViewController {
     // Выполнение поиска при нажатии "Enter"
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // Вызов метода для поиска
-        viewModel.searchMedia(query: searchText)
+        DispatchQueue.main.async {
+            self.viewModel.searchMedia(query: self.searchText)
+        }
     }
     
     private func showErrorMessage(_ message: String) {
@@ -543,20 +549,35 @@ class MusicSearchVC: UIViewController {
         present(alert, animated: true)
     }
     
+    private func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow(notification:)),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide(notification:)),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+    
     func updateSuggestions(_ suggestions: [String]) {
         DispatchQueue.main.async {
             self.searchHistory = suggestions
-//            self.searchResult = []
+            self.searchResult = []
             self.collectionView.reloadData()
         }
     }
     
     func updateSearchResults() {
-        // Perform search using the ViewModel
-        viewModel.searchMedia(query: searchText)
+        DispatchQueue.main.async {
+            self.viewModel.searchMedia(query: self.searchText)
+        }
     }
 }
-
 
  // MARK: - UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
 
@@ -576,7 +597,7 @@ extension MusicSearchVC: UICollectionViewDataSource, UICollectionViewDelegateFlo
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MusicItemCell.nameOfCell, for: indexPath) as! MusicItemCell
             let item = searchResult[indexPath.row]
-            cell.configure(musicItem: item)
+            cell.configure(with: item)
             return cell
         }
     }
@@ -588,7 +609,7 @@ extension MusicSearchVC: UICollectionViewDataSource, UICollectionViewDelegateFlo
             updateSearchResults()
         } else {
             let selectedItem = searchResult[indexPath.row]
-            openDetailView(with: selectedItem)
+            onMediaItemSelected?(selectedItem)
         }
     }
 
@@ -598,9 +619,24 @@ extension MusicSearchVC: UICollectionViewDataSource, UICollectionViewDelegateFlo
         let width = (collectionView.bounds.width - 24) / 2 // Two columns with 8 points of padding
         return CGSize(width: width, height: 90)
     }
-
-    private func openDetailView(with item: MediaItem) {
-        print("OPEN DETAIL VIEW") // TODO: Implement the detail view for the selected media item
+    
+    
+    // MARK: - objc
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if let keyboardSize = (
+            notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue
+        )?.cgRectValue {
+            self.collectionView.contentInset = UIEdgeInsets(
+                top: 8,
+                left: 0,
+                bottom: keyboardSize.height,
+                right: 0
+            )
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        self.collectionView.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 16, right: 0)
     }
 }
 
