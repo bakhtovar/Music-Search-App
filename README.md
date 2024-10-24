@@ -1,12 +1,13 @@
 # Music Search App
 
 ## Overview
-**Music Search App** is an iOS application built with **Swift** and **UIKit**, allowing users to search for media content (music, movies, audiobooks) via the **iTunes Search API**. It features search history, suggestions, and detailed media information.
+**Music Search App** is an iOS application built with Swift and UIKit, following the MVVM (Model-View-ViewModel) architecture. It allows users to search for media content (music, movies, audiobooks) via the iTunes Search API. The app features search history, suggestions, and detailed media information.
 
 ## Features
 - **Search**: Query iTunes API and display results in a two-column grid with relevant media details.
 - **Search History**: Stores up to 5 previous searches, filtered suggestions based on input.
 - **Detailed View**: Displays media details, including title, author, type, description, and links to iTunes.
+- **P
 
 ## Requirements
 - **iOS 15+**
