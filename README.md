@@ -7,7 +7,6 @@
 - **Search**: Query iTunes API and display results in a two-column grid with relevant media details.
 - **Search History**: Stores up to 5 previous searches, filtered suggestions based on input.
 - **Detailed View**: Displays media details, including title, author, type, description, and links to iTunes.
-- **P
 
 ## Requirements
 - **iOS 15+**
