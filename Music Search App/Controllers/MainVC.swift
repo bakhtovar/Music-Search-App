@@ -41,12 +41,12 @@ class MainVC: UIViewController {
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
         label.textAlignment = .center
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
         label.textColor = .black
-        label.text = "Immerse to music"
+        label.text = "Immerse to media"
         return label
     }()
    
@@ -78,7 +78,7 @@ class MainVC: UIViewController {
             iconImageView.heightAnchor.constraint(equalToConstant: 300),
             iconImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            descriptionLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 8),
+            descriptionLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 12),
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
             
