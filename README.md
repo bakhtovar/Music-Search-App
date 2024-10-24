@@ -15,7 +15,7 @@
 - **URLSession**
 
 ## Installation
-1. Clone the repo: `git clone https://github.com/your-username/music-search-app.git`
+1. Clone the repo: `https://github.com/bakhtovar/Music-Search-App.git`
 2. Open in **Xcode** and run.
 
 ## iTunes API Reference
