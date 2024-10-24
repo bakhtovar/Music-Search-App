@@ -9,7 +9,7 @@
 - **Detailed View**: Displays media details, including title, author, type, description, and links to iTunes.
 
 ## Requirements
-- **iOS 14+**
+- **iOS 15+**
 - **Swift**
 - **UIKit**
 - **URLSession**
