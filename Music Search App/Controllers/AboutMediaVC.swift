@@ -10,6 +10,7 @@ import UIKit
 class AboutMediaVC: UIViewController {
     
     // MARK: - Properties
+    
     private var mediaItem: MediaItem
     private var artistDetails: ArtistDetails?
     private let viewModel = MusicSearchViewModel()
@@ -74,7 +75,6 @@ class AboutMediaVC: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 16)
         label.numberOfLines = 0
-        label.text = "Fetching author's info....."
         return label
     }()
     
@@ -113,15 +113,16 @@ class AboutMediaVC: UIViewController {
         view.backgroundColor = .systemBackground
         addSubviews()
         applyConstraints()
+        
+        if let artistId = mediaItem.artistId {
+            viewModel.lookupArtist(artistId: artistId)
+        }
+        
         configureMediaDetails()
         bindViewModel()
         
         contentLinkButton.addTarget(self, action: #selector(didTapContentLink), for: .touchUpInside)
         authorLinkButton.addTarget(self, action: #selector(didTapAuthorLink), for: .touchUpInside)
-        
-        if let artistId = mediaItem.artistId {
-            viewModel.lookupArtist(artistId: artistId)
-        }
     }
     
     // MARK: - private
@@ -217,11 +218,8 @@ class AboutMediaVC: UIViewController {
     private func configureMediaDetails() {
         
         titleLabel.text = "Track: \(mediaItem.trackName ?? "N/A")"
-        
         authorLabel.text = "Author: \(mediaItem.artistName ?? "Unknown")"
-        
         contentTypeLabel.text = "Type: \(mediaItem.wrapperType ?? mediaItem.kind ?? "Unknown")"
-        
         descriptionLabel.text = "Description: \(mediaItem.collectionName ?? "No description available")"
         
         // Load the image if available
